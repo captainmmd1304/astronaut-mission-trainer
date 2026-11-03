@@ -1,6 +1,6 @@
 # Data sources
 
-Everything here is called **only from `apps/api`**. Items marked **VERIFY** must be checked against current docs during implementation; they are written from memory and may have changed.
+Everything here is called **only from `apps/api`**. The verification notes below record the checks completed against the current NASA and JPL documentation and live responses on 2026-11-03.
 
 | Source | Base URL | Key | Used for | Fallback |
 |---|---|---|---|---|
@@ -17,14 +17,14 @@ Register free at `https://api.nasa.gov`. `DEMO_KEY` allows about 30 requests/hou
 ## DONKI notes
 
 - Query by `startDate` / `endDate` (YYYY-MM-DD). Normalize results into `SolarEvent { id, kind: 'flare'|'cme', classType?, startTime, peakTime?, sourceUrl? }`.
-- DONKI is Earth-centric. **VERIFY:** whether `CMEAnalysis` / WSA-Enlil entries expose Mars impact predictions (look for an impact list naming Mars). If not, use a game rule: a wide or Earth-directed CME becomes a *possible* Mars event with a scripted arrival offset, and say so in the UI.
+- DONKI is Earth-centric. Verification found no directly usable Mars impact prediction: the reviewed WSA-Enlil material provides solar-wind/model outputs and Mars-related visualization links, but not a consistent Mars impact record with an arrival time that this app can safely parse. Use a game rule: a wide or Earth-directed CME becomes a *possible* Mars event with a scripted arrival offset, and say so in the UI. Do not present it as a NASA Mars-impact prediction.
 - Flares arrive at light speed; CMEs take days. Game rule: flare = same-sol radiation spike with short warning; CME = multi-sol warning window.
 
 ## Horizons notes
 
-- Request JSON, observer table, `COMMAND='499'` (Mars) with Earth as the observer center, `QUANTITIES` including range (and range-rate). **VERIFY** parameter names and quantity codes in the Horizons API docs.
+- Verified request: JSON observer table, `COMMAND='499'` (Mars), `CENTER='500@399'` (Earth observer), and `QUANTITIES='20'` for target range (`delta`) and range-rate (`deldot`).
 - `lightTimeSeconds = rangeAU × 499.004784`. Typical range of results: about 3 to 22 minutes.
-- Solar conjunction: use the Sun–Observer–Target elongation angle; flag blackout when it is below a threshold (game rule, around a few degrees). **VERIFY** quantity code.
+- Verified solar-conjunction quantity: `QUANTITIES='23'` returns the Sun–Observer–Target (`S-O-T`) elongation angle in degrees. With Mars observed from Earth, this is the Sun–Earth–Mars angle. Flag blackout below a configured threshold (game rule, around a few degrees).
 - Sol length constant: 88,775.244 s (24 h 39 m 35.244 s).
 
 ## Fixtures

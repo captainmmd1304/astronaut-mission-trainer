@@ -111,7 +111,7 @@ Modes built on the same engine:
 
 - One server-side poller (interval from `SPACE_DATA_TTL_MINUTES`). Browsers never call NASA.
 - Three tiers via `SPACE_DATA_MODE`: `live` (call NASA, fall back to cache on error) → `cached` (serve DB cache only) → `fixture` (recorded JSON in `integrations/fixtures`, always available). The response includes `source` so the UI can show a "LIVE / CACHED / REPLAY" badge honestly.
-- Light-time = Earth–Mars range (from Horizons, in AU) × 499.0 s per AU. Verify exact query parameters in `docs/DATA_SOURCES.md`.
+- Light-time = Earth–Mars range (from Horizons, in AU) × 499.0 s per AU. The verified Horizons request and quantity codes are recorded in `docs/DATA_SOURCES.md`.
 - DEMO_KEY is limited to 30 requests/hour and 50/day, so a registered key plus caching is mandatory.
 
 ## 7. Realtime and delayed communications
