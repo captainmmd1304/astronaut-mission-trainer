@@ -1,0 +1,20 @@
+{
+  "name": "@amt/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsup src/server.ts --format esm --noExternal @amt/shared --noExternal @amt/sim --noExternal @amt/content",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@amt/shared": "workspace:*",
+    "@amt/sim": "workspace:*",
+    "@amt/content": "workspace:*"
+  }
+}

@@ -1,0 +1,24 @@
+// PLACEHOLDER (no code yet): Prisma schema, written as a spec in comments.
+// Create the real schema with `pnpm --filter @amt/api exec prisma init`, then translate this outline.
+// Newer Prisma versions keep the connection URL in prisma.config.ts and may need a different generator block.
+//
+// Enums
+//   Role:        OUTPOST | MISSION_CONTROL
+//   RunMode:     solo | coop | scenario | blackbox_refly
+//   RunStatus:   running | failed | completed
+//   RoomStatus:  lobby | running | finished
+//
+// Player          id (uuid), displayName (<=24 chars), createdAt
+// Room            id, code (unique, 6 chars), status, scenarioId, siteId, seed, createdAt, expiresAt
+// RoomMember      id, roomId -> Room, playerId -> Player, role; unique(roomId, playerId)
+// Run             id, playerId -> Player, roomId? -> Room, scenarioId, siteId, seed, mode, difficulty,
+//                 status, decisions (Json), worldSnapshots (Json), score?, startedAt, finishedAt?
+// Message         id, roomId -> Room, fromPlayerId -> Player, role, body (<=140), sentAt, deliverAt, deliveredAt?
+//                 index(roomId, deliverAt) for rescheduling after restart
+// DebriefReport   id, runId -> Run (unique), summary (text), causeChain (Json), objectives (Json),
+//                 generatedBy (llm | template), createdAt
+// SpaceDataCache  key (primary key, e.g. "donki:flr:2026-11" or "horizons:mars-range"), payload (Json), fetchedAt
+//
+// Notes
+//   - Events are NOT stored; they are derived by replaying seed + worldSnapshots + decisions through @amt/sim.
+//   - A cleanup job deletes expired rooms and their messages.
