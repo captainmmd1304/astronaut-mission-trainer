@@ -9,7 +9,7 @@ Project overview lives in `README.md`. System design lives in `docs/ARCHITECTURE
 3. **Dependency direction:** `shared` ← `sim`, `content` ← `web`, `api`. `shared` imports nothing from the repo.
 4. **Contracts first.** Change a request/response/socket payload in `packages/shared` first, then update both `api` and `web`. Never hand-write duplicate types.
 5. **Validate at the edges with zod** (HTTP bodies, socket payloads, env, content files). Trust types inside.
-6. **Content needs sources.** Every real-world fact in `packages/content` must have a `sources` entry (URL to NASA/ESA/JPL/etc.). Fictional material must set `fictional: true`.
+6. **Content needs sources.** Every real-world fact in `packages/content` must have a `sources` entry (URL to NASA/ESA/JPL/etc.). Fictional material must set `fictional: true`. Check `docs/CONTENT_FACTS.md` first: it lists facts already verified, with sources.
 7. **Game balance numbers are abstractions**, not NASA-validated physics. Keep them in config objects, document the intent in `docs/GAME_DESIGN.md`, never bury them in logic.
 8. **Never commit secrets.** `.env` is gitignored; add new vars to `.env.example` and `apps/api/src/config/env.ts`.
 9. **Youth audience.** No personal data (display names only), no free-form profile fields, chat is length-limited and filtered, rooms are private by code and expire.

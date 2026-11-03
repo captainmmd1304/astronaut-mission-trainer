@@ -9,7 +9,8 @@
 //   - Include distractor evidence that looks suspicious but is not causal.
 //   - reflyScenarioId points to a scenario in ../scenarios that recreates the starting conditions.
 //
-// Real case files (add later; each needs sources, verify facts against official reports first):
+// Real case files (add later; each needs sources). Facts are already verified and listed with sources in
+// docs/CONTENT_FACTS.md. Remaining work: write the evidence boards and telemetry frames.
 //   - Mars Climate Orbiter 1999 (unit mismatch)
 //   - Mars Polar Lander 1999
 //   - Schiaparelli 2016

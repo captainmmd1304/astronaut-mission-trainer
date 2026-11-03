@@ -12,12 +12,12 @@ const raw: LandingSite[] = [
     name: 'Jezero Crater',
     terrain: 'mixed',
     real: true,
-    latDeg: 18.4, // approximate; verify
-    lonDeg: 77.5, // approximate; verify
+    latDeg: 18.44, // landing site (Octavia E. Butler Landing); NASA describes Jezero as "about 18 degrees latitude, 77 degrees longitude"
+    lonDeg: 77.45,
     blurb: 'Ancient river delta, landing site of the Perseverance rover. A balanced start.',
     modifiers: { dustDeposition: 1.0, solarInsolation: 1.0, naturalShielding: 0.0, waterIce: 0.5, tempSwing: 1.0 },
     look: { seed: 101, baseColor: '#b5603a', rockDensity: 0.5, roughness: 0.5 },
-    sources: ['https://science.nasa.gov/mars/'], // TODO: replace with the Perseverance landing-site page
+    sources: ['https://www.jpl.nasa.gov/news/press_kits/mars_2020/launch/mission/landing_site/'],
   },
   {
     id: 'bright-dust-plain',

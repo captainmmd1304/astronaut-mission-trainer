@@ -19,13 +19,13 @@ const raw: Scenario[] = [
     sources: [],
   },
   {
-    // HISTORICAL: replace placeholders after fact-checking against NASA sources.
+    // HISTORICAL: facts verified against NASA on 2026-11-03 (see docs/CONTENT_FACTS.md). Balance numbers are still placeholders.
     id: 'dust-storm-2018',
     kind: 'historical',
     title: 'The Great Dust Storm (inspired by 2018)',
     summary: 'A planet-encircling dust storm cuts solar power. Can you keep the outpost alive when the sky goes dark?',
     durationSols: 40,
-    scriptedEvents: [{ sol: 8, type: 'dust-storm', magnitude: 0.9, durationSols: 20 }], // TODO(balance + facts)
+    scriptedEvents: [{ sol: 8, type: 'dust-storm', magnitude: 0.9, durationSols: 20 }], // TODO(balance): timing and size are game abstractions; facts verified in docs/CONTENT_FACTS.md
     learningObjectives: [
       {
         id: 'cut-load-in-storm',
@@ -34,7 +34,7 @@ const raw: Scenario[] = [
       },
     ],
     fictional: false,
-    sources: ['https://science.nasa.gov/mars/'], // TODO: replace with the specific NASA page on the 2018 global dust storm / Opportunity
+    sources: ['https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end'],
   },
 ];
 
