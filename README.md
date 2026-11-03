@@ -33,7 +33,7 @@ Requirements: Node 22+, pnpm 9+, PostgreSQL 15+ (local or Railway).
 
 ```bash
 pnpm install
-cp .env.example .env            # then fill values (see Environment below)
+# copy the two blocks of .env.example into apps/api/.env and apps/web/.env.local, then fill values (see Environment below)
 pnpm db:migrate                 # prisma migrate dev (apps/api)
 pnpm dev                        # web on :3000, api on :4000
 pnpm test                       # runs vitest in packages (sim determinism tests first)
