@@ -1,24 +1,52 @@
-// PLACEHOLDER (no code yet): Prisma schema, written as a spec in comments.
-// Create the real schema with `pnpm --filter @amt/api exec prisma init`, then translate this outline.
-// Newer Prisma versions keep the connection URL in prisma.config.ts and may need a different generator block.
-//
-// Enums
-//   Role:        OUTPOST | MISSION_CONTROL
-//   RunMode:     solo | coop | scenario | blackbox_refly
-//   RunStatus:   running | failed | completed
-//   RoomStatus:  lobby | running | finished
-//
-// Player          id (uuid), displayName (<=24 chars), createdAt
-// Room            id, code (unique, 6 chars), status, scenarioId, siteId, seed, createdAt, expiresAt
-// RoomMember      id, roomId -> Room, playerId -> Player, role; unique(roomId, playerId)
-// Run             id, playerId -> Player, roomId? -> Room, scenarioId, siteId, seed, mode, difficulty,
-//                 status, decisions (Json), worldSnapshots (Json), score?, startedAt, finishedAt?
-// Message         id, roomId -> Room, fromPlayerId -> Player, role, body (<=140), sentAt, deliverAt, deliveredAt?
-//                 index(roomId, deliverAt) for rescheduling after restart
-// DebriefReport   id, runId -> Run (unique), summary (text), causeChain (Json), objectives (Json),
-//                 generatedBy (llm | template), createdAt
-// SpaceDataCache  key (primary key, e.g. "donki:flr:2026-11" or "horizons:mars-range"), payload (Json), fetchedAt
-//
-// Notes
-//   - Events are NOT stored; they are derived by replaying seed + worldSnapshots + decisions through @amt/sim.
-//   - A cleanup job deletes expired rooms and their messages.
+// Neon Postgres. DATABASE_URL = pooled connection string (host has "-pooler"), used at runtime.
+// DIRECT_URL = direct (non-pooled) string, used by `prisma migrate`.
+// Events are NOT stored: they are derived by replaying seed + worldSnapshots + decisions through @amt/sim.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum RunStatus {
+  running
+  failed
+  completed
+}
+
+model Player {
+  id          String   @id @default(uuid())
+  displayName String   @db.VarChar(24)
+  createdAt   DateTime @default(now())
+  runs        Run[]
+}
+
+model Run {
+  id             String    @id @default(uuid())
+  playerId       String
+  player         Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  scenarioId     String
+  siteId         String
+  seed           Int
+  mode           String
+  difficulty     String
+  status         RunStatus @default(running)
+  decisions      Json      @default("[]")
+  worldSnapshots Json      @default("[]")
+  score          Int?
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+
+  @@index([playerId, startedAt])
+}
+
+// Cached NASA responses so a restart does not lose the last good snapshot.
+model SpaceDataCache {
+  key       String   @id
+  payload   Json
+  fetchedAt DateTime @default(now())
+}

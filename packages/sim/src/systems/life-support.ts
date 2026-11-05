@@ -1,10 +1,13 @@
 import type { System } from '../types';
 
-/**
- * Life support system.
- * TODO:
- *  - power need = lifeSupportKwhPerCrew * crew.count; fraction funded = allocation * available / need
- *  - underfunded => o2Days and waterL drain faster; emit 'life-support-deficit' with cause 'power-shortfall'
- *  - crew.health decreases when o2Days or waterL hit zero
- */
-export const lifeSupportSystem: System = (state) => ({ state, events: [] });
+/** Oxygen and water. Full life-support power keeps both steady; no power drains them. */
+export const lifeSupportSystem: System = (state, ctx) => {
+  const b = ctx.rules.balance;
+  const p = state.power.powered.lifeSupport;
+  const o2Days = state.lifeSupport.o2Days - 1 + p;
+  const use = b.waterUseLPerCrewPerSol * state.crew.count;
+  const waterL = Math.max(0, state.lifeSupport.waterL - use * (1 - b.waterRecycleFraction * p));
+  let health = state.crew.health;
+  if (o2Days <= 0 || waterL <= 0) health = Math.max(0, health - b.deprivationHealthLoss);
+  return { state: { ...state, lifeSupport: { o2Days: Math.max(0, o2Days), waterL }, crew: { ...state.crew, health } }, events: [] };
+};

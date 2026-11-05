@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "packageManager": "pnpm@9.15.0",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "pnpm -r --parallel --filter @amt/web --filter @amt/api dev",
     "build": "pnpm -r build",
@@ -11,5 +13,10 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "db:generate": "pnpm --filter @amt/api db:generate",
     "db:migrate": "pnpm --filter @amt/api db:migrate"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.0.0"
   }
 }

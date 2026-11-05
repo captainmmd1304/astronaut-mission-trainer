@@ -30,3 +30,12 @@ Proposed from what he already did (data verification). Change it if he is on som
 - First dependency install and typecheck (Step 0 in `docs/BUILD_PLAN.md`); the scaffold has never been run.
 - Write the black-box hero case content, debrief templates, and NPC Mission Control script.
 - Space Apps submission requirements and demo video plan.
+
+## Backend status (2026-11-05)
+Done and tested (37 tests): `packages/sim` (power, dust, EVA, projects, life support, radiation + powered shelter, food, comms, failure/completion, cause-linked events), `packages/content` (balance, Asteria black box, re-fly scenario, Vikram/Prithvi messages, debrief templates), `apps/api` (guest sessions, space conditions with live → cached → fixture, content with hidden answer key, runs with replay verification, debrief with template fallback and optional free-model rewrite). `docs/STORY_FULL.md` is the complete story.
+
+Next on the backend:
+- Neon: Prisma schema and repositories are written but untested against a real database. Create a Neon project, put the pooled URL in DATABASE_URL and the direct URL in DIRECT_URL (apps/api/.env), then run `pnpm --filter @amt/api db:migrate`.
+- Check the live Horizons and DONKI calls on a machine that can reach NASA (only the fixture path was run here).
+- Balance pass by playtest (`packages/content/src/balance.ts`).
+- Rooms, Socket.IO and delayed comms (deferred until single-player is solid).

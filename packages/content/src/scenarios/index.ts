@@ -36,6 +36,25 @@ const raw: Scenario[] = [
     fictional: false,
     sources: ['https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end'],
   },
+  {
+    // FICTIONAL: Asteria Crew 1's last sols, replayed. See docs/STORY_FULL.md.
+    id: 'asteria-refly',
+    kind: 'historical',
+    title: 'Asteria: re-fly the last sols',
+    summary: "Take over where Crew 1 lost control. A dust storm drains power, then a flare arrives. Keep the options alive.",
+    durationSols: 20,
+    scriptedEvents: [
+      { sol: 2, type: 'dust-storm', magnitude: 0.9, durationSols: 14 },
+      { sol: 12, type: 'solar-flare', magnitude: 0.85 },
+    ],
+    learningObjectives: [
+      { id: 'shelter-before-flare', text: 'Keep the shelter powered before a solar flare arrives', provenBy: { eventType: 'radiation-spike', explainKey: 'sheltered' } },
+      { id: 'cut-load-in-storm', text: 'Reduce non-essential power use during a dust storm', provenBy: { eventType: 'power-shortfall', explainKey: 'load-shed' } },
+      { id: 'clean-panels-early', text: 'Clean panels before the battery reaches a critical level', provenBy: { eventType: 'eva-done', explainKey: 'eva-done' } },
+    ],
+    fictional: true,
+    sources: [],
+  },
 ];
 
 export const scenarios: Scenario[] = raw.map((s) => ScenarioSchema.parse(s));

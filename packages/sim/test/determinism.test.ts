@@ -5,22 +5,8 @@ import type { RunConfig, SimRules } from '../src';
 
 const config: RunConfig = { scenarioId: 'test', siteId: 'jezero', seed: 42, difficulty: 'trainee', crewSize: 4 };
 
-const rules: SimRules = {
-  site: { dustDeposition: 1, solarInsolation: 1, naturalShielding: 0, waterIce: 1, tempSwing: 1 },
-  balance: {
-    panelAreaM2: 100,
-    baseGenerationKwhPerSol: 300,
-    batteryCapKwh: 600,
-    lifeSupportKwhPerCrew: 20,
-    doseBaselineMsvPerSol: 0.6,
-    doseFailMsv: 1000,
-    foodKcalPerCrewPerSol: 2500,
-    startingFoodKcal: 500_000,
-    startingWaterL: 2000,
-  },
-  durationSols: 5,
-  scriptedEvents: [],
-};
+import { testRules } from './fixtures';
+const rules: SimRules = { ...testRules, durationSols: 5 };
 
 const world: WorldSnapshot = {
   capturedAt: '2026-01-01T00:00:00Z',
@@ -65,7 +51,4 @@ describe('sim determinism', () => {
     expect(log.at(-1)?.status).toBe('completed');
   });
 
-  it.todo('radiation spike is mitigated by shelter + shielding');
-  it.todo('dust storm reduces power generation and emits cause-linked events');
-  it.todo('every failure event has a non-empty causedBy chain');
 });

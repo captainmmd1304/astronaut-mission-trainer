@@ -81,3 +81,41 @@ export const BlackBoxCaseSchema = z
   })
   .refine((c) => c.fictional || c.sources.length > 0, { message: 'real case files need sources' });
 export type BlackBoxCase = z.infer<typeof BlackBoxCaseSchema>;
+
+export const BalanceSchema = z.object({
+  baseGenerationKwhPerSol: z.number().positive(),
+  batteryCapKwh: z.number().positive(),
+  startBatteryFraction: z.number().min(0).max(1),
+  lifeSupportKwhPerCrew: z.number().positive(),
+  shelterKwh: z.number().positive(),
+  greenhouseKwh: z.number().positive(),
+  commsKwh: z.number().positive(),
+  dustDepositionPerSol: z.number().min(0),
+  stormDepositionMultiplier: z.number().min(0),
+  stormGenerationBlock: z.number().min(0).max(1),
+  panelDustLoss: z.number().min(0).max(1),
+  evaCleanFraction: z.number().min(0).max(1),
+  evaStormRisk: z.number().min(0).max(1),
+  randomStormChancePerSol: z.number().min(0).max(1),
+  doseBaselineMsvPerSol: z.number().min(0),
+  doseFailMsv: z.number().positive(),
+  flareMaxMsv: z.number().positive(),
+  damageMsv: z.number().positive(),
+  shelterEffectiveness: z.number().min(0).max(1),
+  shelterMinPowered: z.number().min(0).max(1),
+  cmeHitChance: z.number().min(0).max(1),
+  o2DaysStart: z.number().positive(),
+  startingWaterL: z.number().positive(),
+  waterUseLPerCrewPerSol: z.number().positive(),
+  waterRecycleFraction: z.number().min(0).max(1),
+  foodKcalPerCrewPerSol: z.number().positive(),
+  startingFoodKcal: z.number().positive(),
+  startGreenhouseLevel: z.number().min(0).max(1),
+  greenhouseKcalPerLevel: z.number().min(0),
+  starvationHealthLoss: z.number().min(0).max(1),
+  deprivationHealthLoss: z.number().min(0).max(1),
+  projectSols: z.record(z.string(), z.number().int().positive()),
+  batteryLowFraction: z.number().min(0).max(1),
+  evaPostponeDustThreshold: z.number().min(0).max(1),
+});
+export type Balance = z.infer<typeof BalanceSchema>;

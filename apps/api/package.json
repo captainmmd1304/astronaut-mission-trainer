@@ -4,17 +4,33 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsup src/server.ts --format esm --noExternal @amt/shared --noExternal @amt/sim --noExternal @amt/content",
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "build": "tsup",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@amt/shared": "workspace:*",
     "@amt/sim": "workspace:*",
-    "@amt/content": "workspace:*"
+    "@amt/content": "workspace:*",
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "pino": "^9.5.0",
+    "zod": "^3.24.0",
+    "@prisma/client": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.7",
+    "tsx": "^4.19.0",
+    "tsup": "^8.3.0",
+    "prisma": "^6.0.0"
   }
 }

@@ -19,18 +19,48 @@ export interface SiteModifiers {
   tempSwing: number;
 }
 
-/** Tunable numbers. Lives in @amt/content (balance config) and is passed in by the caller. */
+/** Tunable numbers. Defined by the content package (balance config) and passed in by the caller. */
 export interface BalanceConfig {
-  panelAreaM2: number;
+  // power (kWh per sol)
   baseGenerationKwhPerSol: number;
   batteryCapKwh: number;
+  startBatteryFraction: number; // 0..1
   lifeSupportKwhPerCrew: number;
+  shelterKwh: number; // shelter/shielding systems at full power
+  greenhouseKwh: number;
+  commsKwh: number;
+  // dust
+  dustDepositionPerSol: number; // panel coverage gained per sol (before site modifier)
+  stormDepositionMultiplier: number; // extra deposition = m * this
+  stormGenerationBlock: number; // generation lost to opacity = m * this
+  panelDustLoss: number; // generation lost at full coverage
+  evaCleanFraction: number; // share of dust removed by one EVA
+  evaStormRisk: number; // crew health lost on an EVA in a storm (scaled by magnitude)
+  randomStormChancePerSol: number;
+  // radiation
   doseBaselineMsvPerSol: number;
   doseFailMsv: number;
+  flareMaxMsv: number; // dose of a magnitude-1 flare, unshielded
+  damageMsv: number; // unmitigated spike at or above this damages the habitat
+  shelterEffectiveness: number; // dose removed by a fully powered shelter, 0..1
+  shelterMinPowered: number; // powered fraction below which the shelter counts as lost
+  cmeHitChance: number;
+  // consumables
+  o2DaysStart: number;
+  startingWaterL: number;
+  waterUseLPerCrewPerSol: number;
+  waterRecycleFraction: number; // share recovered at full life-support power
   foodKcalPerCrewPerSol: number;
   startingFoodKcal: number;
-  startingWaterL: number;
-  // extend as systems are implemented
+  startGreenhouseLevel: number;
+  greenhouseKcalPerLevel: number; // kcal per sol at level 1.0 and full power
+  // health
+  starvationHealthLoss: number;
+  deprivationHealthLoss: number;
+  // projects: sols of work needed
+  projectSols: Record<string, number>;
+  batteryLowFraction: number;
+  evaPostponeDustThreshold: number;
 }
 
 export interface ScriptedEvent {
@@ -45,19 +75,36 @@ export interface SimRules {
   balance: BalanceConfig;
   durationSols: number; // survive this many sols to complete
   scriptedEvents: ScriptedEvent[]; // historical/black-box scenarios; empty for free play
+  /** Random storms. Defaults to true when scriptedEvents is empty. */
+  randomEvents?: boolean;
 }
+
+export type EffectType = ScriptedEvent['type'] | 'flare-watch' | 'cme-pending';
 
 export interface SimState {
   sol: number;
   rngState: number;
-  power: { batteryKwh: number; panelDust: number /* 0..1 coverage */; availableKwh: number };
+  power: {
+    batteryKwh: number;
+    capKwh: number;
+    panelDust: number; // 0..1 coverage
+    availableKwh: number; // generation this sol
+    /** Powered fraction 0..1 of each consumer this sol. */
+    powered: { lifeSupport: number; shielding: number; greenhouse: number; comms: number };
+  };
   lifeSupport: { o2Days: number; waterL: number };
   food: { stockKcal: number; greenhouseLevel: number };
   radiation: { doseMsvCumulative: number; shieldingLevel: number };
+  habitat: { integrity: number }; // 0..1
   crew: { count: number; health: number; morale: number }; // health/morale 0..1
-  comms: { linkUp: boolean; lastGuidanceSol: number | null };
+  comms: { linkUp: boolean; lastGuidanceSol: number | null; blackoutSols: number };
   projects: { id: string; solsRemaining: number }[];
-  activeEffects: { type: ScriptedEvent['type']; solsRemaining: number; magnitude: number }[];
+  activeEffects: { type: EffectType; solsRemaining: number; magnitude: number; eventId?: string }[];
+  /** Latest event id per cause key, so new events can link back to what led to them. */
+  causes: Record<string, string>;
+  /** Edge-trigger memory (e.g. batteryLow) so events fire once per episode. */
+  flags: Record<string, boolean>;
+  lastEvaPostponedSol: number;
 }
 
 export interface SimEvent {

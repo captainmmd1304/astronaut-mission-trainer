@@ -1,4 +1,13 @@
-// PLACEHOLDER (no code yet)
-// sessions controller. Route: POST /v1/sessions body: CreateSessionBody (displayName only)
-// -> returns { token, playerId, displayName }. Guest identity, no passwords, no email.
-// Apply a profanity filter and the 24-character limit to displayName.
+import { Router } from 'express';
+import { CreateSessionBody } from '@amt/shared';
+import { handler, parseBody } from '../../lib/http';
+import type { SessionsService } from './sessions.service';
+
+export function sessionsRouter(service: SessionsService) {
+  const r = Router();
+  r.post('/', handler(async (req, res) => {
+    const body = parseBody(CreateSessionBody, req.body);
+    res.status(201).json(await service.createGuest(body.displayName));
+  }));
+  return r;
+}
