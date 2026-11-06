@@ -6,8 +6,8 @@ Purpose: let the whole app run offline and make demos immune to NASA outages (`S
 
 | File | Status | Window | Notes |
 |---|---|---|---|
-| `horizons-closest-approach.json` | recorded 2026-11-03 | 2018-07-29 to 2018-08-02, 1-day steps | Earth-Mars range about 0.385 AU, so one-way light-time about 192 s (3.2 min). Mars near opposition, Sun-Observer-Target about 170-173 degrees. |
-| `horizons-conjunction.json` | recorded 2026-11-03 | 2021-10-03 to 2021-10-13, 1-day steps | Range about 2.63 AU, so light-time about 1,312 s (21.9 min). Minimum Sun-Observer-Target 0.6551 degrees on 2021-Oct-08 (solar conjunction, comms blackout). |
+| `horizons-closest-approach.json` | recorded 2026-11-03; verified 2026-11-06 | 2018-07-29 to 2018-08-02, 1-day steps | Fresh Horizons query matched every stored row. Earth-Mars range about 0.385 AU, so one-way light-time about 192 s (3.2 min). Mars near opposition, Sun-Observer-Target about 170-173 degrees. |
+| `horizons-conjunction.json` | recorded 2026-11-03; verified 2026-11-06 | 2021-10-03 to 2021-10-13, 1-day steps | Fresh Horizons query matched every stored row. Range about 2.63 AU, so light-time about 1,312 s (21.9 min). Minimum Sun-Observer-Target 0.6551 degrees on 2021-Oct-08 (solar conjunction, comms blackout). |
 | `donki-quiet-week.json` | PENDING | choose a quiet week (few or no strong flares) | not recorded yet |
 | `donki-active-week.json` | PENDING | suggested: 2024-05-08 to 2024-05-15 (strong flares and a major geomagnetic storm; confirm in DONKI) | not recorded yet |
 
@@ -29,4 +29,5 @@ Light-time check: `lightTimeSeconds = delta x 499.004784`.
 ## Capture log
 
 - 2026-11-03: Horizons closest approach and conjunction recorded (via browser pane, no API key needed).
+- 2026-11-06: Fresh NASA/JPL Horizons queries using the recorded command, observer center, quantities, date windows, and 1-day step matched every stored row in both Horizons fixtures. Closest approach minimum: 0.38497382377498 AU on 2018-Jul-31; conjunction minimum: 0.6551 degrees on 2021-Oct-08 with range 2.62862109938076 AU.
 - 2026-11-03: DONKI attempts failed with upstream connection timeouts (NASA side).
