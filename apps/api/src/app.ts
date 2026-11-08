@@ -3,6 +3,7 @@ import express from 'express';
 import type { Env } from './config/env';
 import { requireAuth } from './lib/auth';
 import { errorMiddleware } from './lib/http';
+import { rateLimit } from './lib/rate-limit';
 import { fetchSolarEvents } from './integrations/donki.client';
 import { fetchHorizons } from './integrations/horizons.client';
 import { contentRouter } from './modules/content/content.controller';
@@ -41,14 +42,17 @@ export function createApp(env: Env, deps: AppDeps = {}) {
 
   const app = express();
   app.disable('x-powered-by');
+  app.set('trust proxy', 1); // Railway/Vercel sit in front: use the real client IP for rate limits
   app.use(cors({ origin: env.CORS_ORIGIN.split(',').map((s) => s.trim()) }));
   app.use(express.json({ limit: '200kb' }));
 
   app.get('/health', (_req, res) => res.json({ ok: true, spaceDataMode: env.SPACE_DATA_MODE, commsTimeScale: env.COMMS_TIME_SCALE }));
-  app.use('/v1/sessions', sessionsRouter(sessions));
+  app.use('/v1', rateLimit({ windowMs: 60_000, max: 120 }));
+  // guest sessions are the open door: keep it tight
+  app.use('/v1/sessions', rateLimit({ windowMs: 60 * 60_000, max: env.NODE_ENV === 'test' ? 1000 : 20 }), sessionsRouter(sessions));
   app.use('/v1/content', contentRouter());
   app.use('/v1/space', spaceDataRouter(space, env.SPACE_DATA_MODE));
-  app.use('/v1/runs', auth, runsRouter(runs), debriefRouter(runs, debrief));
+  app.use('/v1/runs', auth, runsRouter(runs, space), debriefRouter(runs, debrief));
 
   app.use((_req, res) => res.status(404).json({ error: { code: 'not_found', message: 'No such route' } }));
   app.use(errorMiddleware(log));

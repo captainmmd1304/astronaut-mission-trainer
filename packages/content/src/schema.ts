@@ -97,6 +97,7 @@ export const BalanceSchema = z.object({
   evaCleanFraction: z.number().min(0).max(1),
   evaStormRisk: z.number().min(0).max(1),
   randomStormChancePerSol: z.number().min(0).max(1),
+  randomCmeChancePerSol: z.number().min(0).max(1),
   doseBaselineMsvPerSol: z.number().min(0),
   doseFailMsv: z.number().positive(),
   flareMaxMsv: z.number().positive(),

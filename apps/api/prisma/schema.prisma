@@ -1,5 +1,5 @@
-// Neon Postgres. DATABASE_URL = pooled connection string (host has "-pooler"), used at runtime.
-// DIRECT_URL = direct (non-pooled) string, used by `prisma migrate`.
+// Neon Postgres. DATABASE_URL_POOLED = pooled string (host has "-pooler"), used at runtime.
+// DATABASE_URL = direct (non-pooled) string, used by `prisma migrate`.
 // Events are NOT stored: they are derived by replaying seed + worldSnapshots + decisions through @amt/sim.
 
 generator client {
@@ -8,8 +8,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  url       = env("DATABASE_URL_POOLED")
+  directUrl = env("DATABASE_URL")
 }
 
 enum RunStatus {

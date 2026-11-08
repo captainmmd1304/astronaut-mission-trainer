@@ -35,5 +35,6 @@ Neon database setup completed and verified: pooled and direct connection URLs ar
 
 Next on the backend:
 - Check the live Horizons and DONKI calls on a machine that can reach NASA (only the fixture path was run here).
-- Balance pass by playtest (`packages/content/src/balance.ts`).
+- Balance: two passes done with `pnpm --filter @amt/api playtest`. Trainee: careless bots lose, careful bot wins. Commander: dust storm is hard (careful bot wins ~29%), Asteria re-fly and free play are won by the careful bot but with much higher doses. Needs real playtesters.
+- Deploy the API on Railway: `railway.json` is in the repo root. In Railway: new project from the GitHub repo, add the env vars from `.env.example` (both Neon URLs, JWT_SECRET, NASA_API_KEY, SPACE_DATA_MODE=live, CORS_ORIGIN = the web URL), generate a public domain, check `/health`.
 - Rooms, Socket.IO and delayed comms (deferred until single-player is solid).

@@ -75,3 +75,16 @@ describe('api', () => {
     expect(r.status).toBe(404);
   });
 });
+
+describe('start run and limits', () => {
+  it('start returns rules, scenario, site and a world snapshot in one response', async () => {
+    const t = (await api.call('POST', '/v1/sessions', { displayName: 'Starter' })).body.token;
+    const r = await api.call('POST', '/v1/runs', { scenarioId: 'asteria-refly', siteId: 'jezero', seed: 5, mode: 'blackbox-refly', difficulty: 'trainee' }, t);
+    expect(r.status).toBe(201);
+    expect(r.body.rules.durationSols).toBe(20);
+    expect(r.body.rules.scriptedEvents.length).toBeGreaterThan(0);
+    expect(r.body.site.id).toBe('jezero');
+    expect(r.body.world.lightTimeSeconds).toBeGreaterThan(0);
+    expect(r.body.config.crewSize).toBe(4);
+  });
+});

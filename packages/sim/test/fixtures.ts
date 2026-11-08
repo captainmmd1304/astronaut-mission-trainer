@@ -20,6 +20,7 @@ export const testRules: SimRules = {
     evaCleanFraction: 0.7,
     evaStormRisk: 0.15,
     randomStormChancePerSol: 0.02,
+    randomCmeChancePerSol: 0,
     doseBaselineMsvPerSol: 0.6,
     doseFailMsv: 1000,
     flareMaxMsv: 120,

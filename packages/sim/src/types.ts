@@ -37,6 +37,7 @@ export interface BalanceConfig {
   evaCleanFraction: number; // share of dust removed by one EVA
   evaStormRisk: number; // crew health lost on an EVA in a storm (scaled by magnitude)
   randomStormChancePerSol: number;
+  randomCmeChancePerSol: number; // chance per sol of a CME forecast (it may or may not hit; see cmeHitChance)
   // radiation
   doseBaselineMsvPerSol: number;
   doseFailMsv: number;

@@ -5,7 +5,8 @@ const bool = z.enum(['live', 'cached', 'fixture']);
 const EnvSchema = z.object({
   PORT: z.coerce.number().int().default(4000),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  DATABASE_URL: z.string().optional(), // absent => in-memory store
+  DATABASE_URL: z.string().optional(), // Neon direct string (migrations). All db vars absent => in-memory store
+  DATABASE_URL_POOLED: z.string().optional(), // Neon pooled string, preferred at runtime
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   NASA_API_KEY: z.string().default('DEMO_KEY'),

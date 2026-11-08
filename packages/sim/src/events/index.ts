@@ -24,7 +24,7 @@ const DEFAULT_STORM_SOLS = 6;
 
 /**
  * World events: turns scripted scenario events and live WorldSnapshot events into active effects.
- * Always draws exactly two random numbers per sol so recorded runs stay aligned.
+ * Always draws exactly three random numbers per sol so recorded runs stay aligned.
  */
 export const worldEventsSystem: System = (state, ctx) => {
   const { rules, world } = ctx;
@@ -32,6 +32,7 @@ export const worldEventsSystem: System = (state, ctx) => {
   const em = new Emitter(state.sol, ctx.priorEvents);
   const r1 = ctx.rng.next();
   const r2 = ctx.rng.next();
+  const r3 = ctx.rng.next();
 
   // 1. age effects; cme-pending that expire may become a real spike
   const effects: SimState['activeEffects'] = [];
@@ -90,6 +91,14 @@ export const worldEventsSystem: System = (state, ctx) => {
     const ev = em.emit('dust-storm-start', 'dust-storm-start', [], { magnitude });
     causes['dust-storm'] = ev.id;
     effects.push({ type: 'dust-storm', solsRemaining: DEFAULT_STORM_SOLS + Math.floor(r2 * 6), magnitude, eventId: ev.id });
+  }
+
+  // 3b. random CME forecast (free play): a watch now, may arrive in 2 sols
+  const forecastActive = effects.some((e) => e.type === 'flare-watch' || e.type === 'cme-pending' || e.type === 'solar-flare');
+  if (random && !forecastActive && r3 < b.randomCmeChancePerSol) {
+    const magnitude = Math.round((0.25 + 0.65 * r2) * 100) / 100;
+    addWatch(magnitude, 3);
+    effects.push({ type: 'cme-pending', solsRemaining: 2, magnitude, eventId: causes['flare-watch'] });
   }
 
   // 4. live space weather from the stored snapshot

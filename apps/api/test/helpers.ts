@@ -5,7 +5,7 @@ import type { AddressInfo } from 'node:net';
 import type { SolDecisions } from '@amt/shared';
 
 export const testEnv = (over: Record<string, string> = {}) =>
-  loadEnv({ JWT_SECRET: 'test-secret-test-secret', SPACE_DATA_MODE: 'fixture', ...over });
+  loadEnv({ NODE_ENV: 'test', JWT_SECRET: 'test-secret-test-secret', SPACE_DATA_MODE: 'fixture', ...over });
 
 export async function startApp(over: Record<string, string> = {}, deps: AppDeps = {}) {
   const app = createApp(testEnv(over), deps);
