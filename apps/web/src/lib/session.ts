@@ -1,18 +1,21 @@
 import { api, type Session } from './api';
 
 const KEY = 'amt.session';
+let memory: Session | null = null;
 
-/** Guest session lives in localStorage. Every access is wrapped: storage can be blocked or empty. */
+/** The session lives in localStorage. Every access is wrapped: storage can be blocked or empty. */
 export function loadSession(): Session | null {
+  if (memory) return memory;
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Session) : null;
+    return raw ? (memory = JSON.parse(raw) as Session) : null;
   } catch {
     return null;
   }
 }
 
 export function saveSession(s: Session) {
+  memory = s;
   try {
     localStorage.setItem(KEY, JSON.stringify(s));
   } catch {
@@ -20,12 +23,32 @@ export function saveSession(s: Session) {
   }
 }
 
-let memory: Session | null = null;
+export function clearSession() {
+  memory = null;
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    /* ignore */
+  }
+}
 
-export async function ensureSession(displayName?: string): Promise<Session> {
-  const existing = memory ?? loadSession();
-  if (existing && !displayName) return (memory = existing);
-  const created = await api.createSession(displayName?.trim() || existing?.displayName || 'Cadet');
-  saveSession(created);
-  return (memory = created);
+export async function signIn(username: string, password: string) {
+  const s = await api.login(username, password);
+  saveSession(s);
+  return s;
+}
+export async function signUp(username: string, password: string, displayName?: string) {
+  const s = await api.register(username, password, displayName);
+  saveSession(s);
+  return s;
+}
+export async function playAsGuest(displayName: string) {
+  const s = await api.createSession(displayName.trim() || 'Cadet');
+  saveSession(s);
+  return s;
+}
+
+/** Existing session, else a guest one. The pages are gated by AuthGate, so the fallback is only a safety net. */
+export async function ensureSession(): Promise<Session> {
+  return loadSession() ?? playAsGuest('Cadet');
 }

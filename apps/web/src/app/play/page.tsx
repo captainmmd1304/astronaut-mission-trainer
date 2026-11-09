@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Viewport } from '@/components/Viewport';
-import { Decisions } from '@/components/play/Decisions';
+import { AccountChip } from '@/components/AccountChip';
+import { AuthGate } from '@/components/AuthGate';
+import { Icon } from '@/components/Icon';
+import { Tour, markTourSeen, tourSeen, type TourStep } from '@/components/Tour';
+import { BuildPicker, CrewOrders } from '@/components/play/Decisions';
 import { EarthLink, Gauges } from '@/components/play/Gauges';
 import { LogPanel } from '@/components/play/LogPanel';
 import { PowerBus } from '@/components/play/PowerBus';
@@ -12,7 +16,20 @@ import { useGame } from '@/game/store';
 import { api, ApiError } from '@/lib/api';
 import { ensureSession } from '@/lib/session';
 
-export default function Play() {
+function tourSteps(sols: number): TourStep[] {
+  return [
+    { title: 'You are in command', body: `You run a Mars outpost with a crew of four. Keep everyone alive for ${sols} sols (Martian days). This tour takes about a minute.` },
+    { target: 'sol', title: 'One turn is one sol', body: 'Each sol you make a few choices, then end the sol and watch what happens. The strip shows every sol: orange is now, amber and red mark trouble.' },
+    { target: 'gauges', title: 'Keep these alive', body: 'Battery, air, water and food keep the crew breathing and fed. A bar that turns amber is a warning. Red and blinking means act now.' },
+    { target: 'power', title: 'Step 1: share the power', body: 'The panels make a set amount each sol. Drag the round grips, or tap + and −, to decide who gets it. The white arrow shows how much each system needs.' },
+    { target: 'crew', title: 'Step 2: give crew orders', body: 'Shelter protects the crew from radiation but needs power. A spacewalk cleans dust off the panels, but it is dangerous in a storm or a radiation warning.' },
+    { target: 'build', title: 'Step 3: pick a project', body: 'A project takes a few sols and then helps for good. Choose none if the crew is busy surviving.' },
+    { target: 'end', title: 'End the sol', body: 'When you are happy with your choices, press this. The day passes, supplies are used and events can happen.' },
+    { target: 'log', title: 'Earth is minutes away', body: 'Messages from Earth take real time to arrive because light is slow. You will often have to decide before help replies. That delay is the whole challenge.' },
+  ];
+}
+
+function PlayInner() {
   const router = useRouter();
   const run = useGame((s) => s.run);
   const sim = useGame((s) => s.sim);
@@ -21,7 +38,15 @@ export default function Play() {
   const commit = useGame((s) => s.commit);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const draft = useGame((s) => s.draft);
+  const [tour, setTour] = useState(false);
   const sending = useRef(false);
+  useEffect(() => {
+    if (!tourSeen()) {
+      const t = setTimeout(() => setTour(true), 3800); // after the arrival shot settles
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   // A page reload loses the in-memory run: go back and pick again.
   useEffect(() => {
@@ -52,64 +77,129 @@ export default function Play() {
   const solNow = over ? sim.sol : sim.sol + 1;
 
   return (
-    <main className="min-h-dvh md:grid md:h-dvh md:grid-cols-[92px_minmax(0,1fr)_360px] md:grid-rows-[auto_minmax(0,1fr)] md:overflow-hidden">
-      <header className="flex items-start justify-between gap-4 px-5 py-3 md:col-span-3 md:px-6">
-        <div>
-          <Link href="/" className="text-[22px] font-medium leading-none">
-            Asteria
-          </Link>
-          <div className="instrument mt-1 text-[14px] text-bone/65">
-            {run.site.name}. {run.scenario.title}
-          </div>
-        </div>
-        <EarthLink />
-      </header>
+    <main className="relative min-h-dvh md:h-dvh md:overflow-hidden">
+      <Viewport sim={sim} look={run.site.look} frame={false} eva={draft?.eva ?? false} shelter={draft?.shelter ?? false} className="fixed inset-0" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(10,5,4,0.7))]" />
 
-      <aside className="px-5 pb-2 md:overflow-hidden md:px-3 md:pb-0 md:pl-6">
-        <SolRail />
-      </aside>
+      <div key={solNow} className="sol-title pointer-events-none fixed inset-x-0 top-[34%] z-30 text-center">
+        <div className="font-sans text-[clamp(3rem,10vw,7rem)] font-extrabold leading-none tracking-tight text-bone drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]">Sol {solNow}</div>
+        <div className="font-sans text-[18px] font-semibold text-haze">of {run.rules.durationSols}</div>
+      </div>
 
-      <section className="flex min-h-0 flex-col">
-        <div className="relative h-[46vh] min-h-[16rem] md:h-auto md:flex-1">
-          <Viewport sim={sim} look={run.site.look} className="absolute inset-0" />
-          <div className="pointer-events-none absolute bottom-[7%] left-[3.5%] z-10 md:bottom-[9%]">
-            <div className="text-[clamp(2.6rem,6vw,4.6rem)] font-medium leading-none">Sol {solNow}</div>
-            <div className="instrument mt-1 text-[15px] text-bone/70">of {run.rules.durationSols}</div>
-          </div>
-          {over && (
-            <div className="absolute inset-x-[27%] bottom-[10%] z-20 bg-night/90 p-5">
-              <p className="text-[19px] leading-snug">
-                {status === 'failed' ? `The habitat was lost on sol ${sim.sol}. Here is what led to it.` : `You held the outpost for ${sim.sol} sols.`}
-              </p>
-              {error && (
-                <p role="alert" className="mt-2 text-[15px] text-critical">
-                  {error}
-                </p>
-              )}
-              <div className="mt-4 font-sans">
-                {saved ? (
-                  <button type="button" onClick={() => router.push(`/debrief/${run.runId}`)} className="bg-ember px-5 py-2.5 text-[16px] font-semibold text-night hover:bg-haze">
-                    Open the debrief
-                  </button>
-                ) : (
-                  <button type="button" onClick={save} className="bg-ember px-5 py-2.5 text-[16px] font-semibold text-night hover:bg-haze">
-                    {error ? 'Try saving again' : 'Saving'}
-                  </button>
-                )}
-              </div>
+      <div className="relative z-10 flex min-h-dvh flex-col gap-3 p-3 md:h-full md:min-h-0 md:p-4">
+        <header className="panel flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2.5">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="font-sans text-[20px] font-extrabold text-haze">
+              Asteria
+            </Link>
+            <div className="hidden font-sans text-[13.5px] leading-tight text-bone/75 lg:block">
+              {run.site.name}
+              <br />
+              {run.scenario.title}
             </div>
-          )}
-        </div>
-        <div className="h-48 shrink-0 border-t border-rust/40 px-5 py-2 md:px-6">
-          <LogPanel />
-        </div>
-      </section>
+          </div>
+          <div data-tour="sol" className="order-last w-full min-w-0 md:order-none md:w-auto md:max-w-[46vw] md:flex-1">
+            <SolRail />
+          </div>
+          <div className="flex items-center gap-2 md:gap-3">
+            <EarthLink />
+            <button type="button" className="key key-quiet" onClick={() => setTour(true)}>
+              <Icon name="help" size={18} /> <span className="hidden sm:inline">How to play</span>
+            </button>
+            <AccountChip />
+          </div>
+        </header>
 
-      <aside className="min-h-0 space-y-7 px-5 py-5 md:overflow-y-auto md:py-2 md:pr-6">
-        <PowerBus />
-        <Gauges />
-        {!over && <Decisions onEnd={commit} />}
-      </aside>
+        <div className="h-[30vh] shrink-0 md:hidden" aria-hidden />
+        <div className="grid min-h-0 flex-1 gap-3 md:grid-cols-[300px_minmax(0,1fr)_390px]">
+          <aside data-tour="gauges" className="panel rise min-h-0 p-3 md:overflow-y-auto">
+            <h2 className="panel-title mb-2 px-1">Outpost status</h2>
+            <Gauges />
+          </aside>
+
+          <section className="flex min-h-[16rem] flex-col justify-end gap-3">
+            {over && (
+              <div className="panel rise mx-auto max-w-md p-6 text-center">
+                <p className="font-sans text-[24px] font-extrabold leading-tight">
+                  {status === 'failed' ? `The habitat was lost on sol ${sim.sol}` : `You held the outpost for ${sim.sol} sols`}
+                </p>
+                <p className="mt-1 text-[16px] text-bone/80">{status === 'failed' ? 'The debrief shows what led to it.' : 'Open the debrief to see how you did.'}</p>
+                {error && (
+                  <p role="alert" className="mt-3 text-[15px] text-critical">
+                    {error}
+                  </p>
+                )}
+                <div className="mt-4">
+                  {saved ? (
+                    <button type="button" onClick={() => router.push(`/debrief/${run.runId}`)} className="key key-go pulse">
+                      Open the debrief
+                    </button>
+                  ) : (
+                    <button type="button" onClick={save} className="key key-go">
+                      {error ? 'Try saving again' : 'Saving'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+            <div data-tour="log" className="panel h-44 shrink-0 px-4 py-2 md:h-48">
+              <LogPanel />
+            </div>
+          </section>
+
+          <aside className="panel rise flex min-h-0 flex-col p-3" style={{ animationDelay: '0.1s' }}>
+            <div className="min-h-0 flex-1 space-y-5 md:overflow-y-auto md:pr-1">
+              <div data-tour="power">
+                <h2 className="panel-title mb-2 flex items-center gap-2">
+                  <span className="step-badge">1</span> Share the power
+                </h2>
+                <PowerBus />
+              </div>
+              {!over && (
+                <>
+                  <div data-tour="crew">
+                    <h2 className="panel-title mb-2 flex items-center gap-2">
+                      <span className="step-badge">2</span> Crew orders
+                    </h2>
+                    <CrewOrders />
+                  </div>
+                  <div data-tour="build">
+                    <h2 className="panel-title mb-2 flex items-center gap-2">
+                      <span className="step-badge">3</span> Build project
+                    </h2>
+                    <BuildPicker />
+                  </div>
+                </>
+              )}
+            </div>
+            {!over && (
+              <div data-tour="end" className="mt-3 shrink-0 border-t border-rust/40 pt-3">
+                <button type="button" onClick={commit} className="key key-go pulse w-full !text-[19px]">
+                  End sol {draft?.sol} <Icon name="play" size={18} />
+                </button>
+              </div>
+            )}
+          </aside>
+        </div>
+      </div>
+
+      {tour && (
+        <Tour
+          steps={tourSteps(run.rules.durationSols)}
+          onClose={() => {
+            markTourSeen();
+            setTour(false);
+          }}
+        />
+      )}
     </main>
+  );
+}
+
+export default function Play() {
+  return (
+    <AuthGate>
+      <PlayInner />
+    </AuthGate>
   );
 }

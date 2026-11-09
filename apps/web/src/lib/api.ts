@@ -97,6 +97,9 @@ export interface Debrief {
 }
 
 export const api = {
+  register: (username: string, password: string, displayName?: string) => call<Session>('POST', '/v1/auth/register', { username, password, displayName }),
+  login: (username: string, password: string) => call<Session>('POST', '/v1/auth/login', { username, password }),
+  me: (token: string) => call<{ playerId: string; displayName: string }>('GET', '/v1/auth/me', undefined, token),
   createSession: (displayName: string) => call<Session>('POST', '/v1/sessions', { displayName }),
   sites: () => call<{ sites: LandingSite[] }>('GET', '/v1/content/sites').then((r) => r.sites),
   scenarios: () => call<{ scenarios: Scenario[] }>('GET', '/v1/content/scenarios').then((r) => r.scenarios),

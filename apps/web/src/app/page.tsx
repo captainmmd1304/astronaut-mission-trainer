@@ -1,13 +1,16 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Viewport } from '@/components/Viewport';
+import { PlanetStage } from '@/components/PlanetStage';
 import { api } from '@/lib/api';
+import { loadSession } from '@/lib/session';
 import { lightTimeLabel } from '@/lib/text';
 
 export default function Landing() {
   const [lt, setLt] = useState<{ seconds: number; source: string } | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
+    setSignedIn(!!loadSession());
     api
       .conditions()
       .then((r) => setLt({ seconds: r.snapshot.lightTimeSeconds, source: r.source }))
@@ -15,29 +18,32 @@ export default function Landing() {
   }, []);
 
   return (
-    <main className="relative h-dvh min-h-[34rem] overflow-hidden">
-      <Viewport sim={null} side="right" className="absolute inset-0" />
-      <div className="settle absolute inset-x-0 bottom-0 z-10 px-6 pb-10 md:px-[6vw] md:pb-[9vh]">
-        <h1 className="max-w-[17ch] text-[clamp(2.4rem,6.2vw,4.6rem)] font-medium leading-[1.02] tracking-[-0.015em]">
-          Asteria’s first crew came home early. The habitat did not.
-        </h1>
-        <p className="mt-5 max-w-[46ch] text-[19px] leading-snug text-bone/85">
-          Run a Mars outpost with the real delay to Earth and real space weather. Read the black box, then take command.
-        </p>
-        <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 font-sans">
-          <Link href="/missions" className="bg-ember px-6 py-3 text-[16px] font-semibold text-night transition-colors hover:bg-haze">
-            Start the mission
-          </Link>
-          <Link href="/blackbox" className="py-3 text-[16px] text-bone underline decoration-rust decoration-2 underline-offset-[6px] hover:decoration-ember">
-            Read the black box first
-          </Link>
-        </div>
-        {lt && (
-          <p className="instrument mt-8 text-[14px] text-starlight/90">
-            Right now a signal takes {lightTimeLabel(lt.seconds)} to cross between Earth and Mars
-            {lt.source !== 'live' && ` (${lt.source} data)`}. The game uses that number.
+    <main className="relative h-dvh min-h-[36rem] overflow-hidden">
+      <PlanetStage offsetX={-4.2} />
+      <div className="absolute inset-0 bg-gradient-to-r from-night/90 via-night/40 to-transparent md:via-night/20" />
+      <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-10 md:justify-center md:px-[6vw] md:pb-0">
+        <div className="max-w-[34rem]">
+          <p className="rise font-sans text-[15px] font-semibold text-haze">NASA Space Apps 2026 · Junior Astronaut Mission Trainer</p>
+          <h1 className="rise mt-3 text-[clamp(2.5rem,6.4vw,5rem)] font-medium leading-[1] tracking-[-0.02em]" style={{ animationDelay: '0.1s' }}>
+            Keep a Mars outpost alive.
+          </h1>
+          <p className="rise mt-5 max-w-[44ch] text-[20px] leading-snug text-bone/90" style={{ animationDelay: '0.25s' }}>
+            Asteria’s first crew came home early and the habitat did not survive. Take command with real space weather and the real delay to Earth, and find out why.
           </p>
-        )}
+          <div className="rise mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: '0.4s' }}>
+            <Link href={signedIn ? '/missions' : '/login'} className="key key-go pulse">
+              {signedIn ? 'Continue' : 'Play now'}
+            </Link>
+            <Link href="/blackbox" className="key">
+              Read the black box
+            </Link>
+          </div>
+          {lt && (
+            <p className="rise instrument mt-8 text-[15px] text-starlight" style={{ animationDelay: '0.6s' }}>
+              Right now a signal takes {lightTimeLabel(lt.seconds)} to travel between Earth and Mars{lt.source !== 'live' && ` (${lt.source} data)`}. The game uses that number.
+            </p>
+          )}
+        </div>
       </div>
     </main>
   );

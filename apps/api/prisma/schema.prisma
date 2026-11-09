@@ -21,6 +21,8 @@ enum RunStatus {
 model Player {
   id          String   @id @default(uuid())
   displayName String   @db.VarChar(24)
+  username     String?  @unique @db.VarChar(24)
+  passwordHash String?
   createdAt   DateTime @default(now())
   runs        Run[]
 }

@@ -1,12 +1,13 @@
 'use client';
 import Link from 'next/link';
+import { AuthGate } from '@/components/AuthGate';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useGame } from '@/game/store';
 import { api, ApiError, type Debrief, type RunRecord } from '@/lib/api';
 import { ensureSession } from '@/lib/session';
 
-export default function DebriefPage() {
+function DebriefInner() {
   const { runId } = useParams<{ runId: string }>();
   const router = useRouter();
   const begin = useGame((s) => s.begin);
@@ -50,7 +51,7 @@ export default function DebriefPage() {
     return (
       <main className="min-h-dvh px-6 py-12 md:px-[8vw]">
         <p role="alert" className="max-w-[50ch] border-l-2 border-critical pl-3 text-[18px]">{error}</p>
-        <Link href="/missions" className="mt-6 inline-block font-sans underline decoration-ember underline-offset-4">Pick a mission</Link>
+        <Link href="/missions" className="key key-go mt-6">Pick a mission</Link>
       </main>
     );
   }
@@ -105,18 +106,26 @@ export default function DebriefPage() {
 
         <section className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-4 font-sans">
           {firstCauseSol !== undefined && record && (
-            <button type="button" disabled={busy} onClick={() => tryAgain(firstCauseSol)} className="bg-ember px-6 py-3 text-[16px] font-semibold text-night hover:bg-haze disabled:opacity-50">
+            <button type="button" disabled={busy} onClick={() => tryAgain(firstCauseSol)} className="key key-go">
               Try again from sol {firstCauseSol}
             </button>
           )}
-          <button type="button" disabled={busy || !record} onClick={() => tryAgain(1)} className="py-3 text-[16px] underline decoration-rust decoration-2 underline-offset-[6px] hover:decoration-ember">
+          <button type="button" disabled={busy || !record} onClick={() => tryAgain(1)} className="key">
             Start over with the same sky
           </button>
-          <Link href="/missions" className="py-3 text-[16px] underline decoration-rust decoration-2 underline-offset-[6px] hover:decoration-ember">
+          <Link href="/missions" className="key">
             Pick another mission
           </Link>
         </section>
       </div>
     </main>
+  );
+}
+
+export default function DebriefPage() {
+  return (
+    <AuthGate>
+      <DebriefInner />
+    </AuthGate>
   );
 }

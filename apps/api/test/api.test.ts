@@ -88,3 +88,23 @@ describe('start run and limits', () => {
     expect(r.body.config.crewSize).toBe(4);
   });
 });
+
+describe('accounts', () => {
+  it('registers, logs in, rejects a wrong password and a taken name', async () => {
+    const t = await startApp();
+    try {
+      const reg = await t.call('POST', '/v1/auth/register', { username: 'Sisi_01', password: 'longenough1', displayName: 'Sisi' });
+      expect(reg.status).toBe(201);
+      expect(reg.body.displayName).toBe('Sisi');
+      expect((await t.call('POST', '/v1/auth/register', { username: 'sisi_01', password: 'longenough1' })).status).toBe(409);
+      expect((await t.call('POST', '/v1/auth/login', { username: 'sisi_01', password: 'nope-nope' })).status).toBe(401);
+      const ok = await t.call('POST', '/v1/auth/login', { username: 'SISI_01', password: 'longenough1' });
+      expect(ok.status).toBe(200);
+      const me = await t.call('GET', '/v1/auth/me', undefined, ok.body.token);
+      expect(me.body.playerId).toBe(reg.body.playerId);
+      expect((await t.call('POST', '/v1/auth/register', { username: 'ab', password: 'short' })).status).toBe(400);
+    } finally {
+      await t.close();
+    }
+  });
+});

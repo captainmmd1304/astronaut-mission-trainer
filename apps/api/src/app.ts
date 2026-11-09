@@ -14,7 +14,7 @@ import { RunsService } from './modules/runs/runs.service';
 import { runsRouter } from './modules/runs/runs.controller';
 import { MemoryPlayerRepository, type PlayerRepository } from './modules/sessions/sessions.repository';
 import { SessionsService } from './modules/sessions/sessions.service';
-import { sessionsRouter } from './modules/sessions/sessions.controller';
+import { authRouter, sessionsRouter } from './modules/sessions/sessions.controller';
 import { SpaceDataService, type SpaceDataDeps } from './modules/space-data/space-data.service';
 import { spaceDataRouter } from './modules/space-data/space-data.controller';
 
@@ -49,6 +49,7 @@ export function createApp(env: Env, deps: AppDeps = {}) {
   app.get('/health', (_req, res) => res.json({ ok: true, spaceDataMode: env.SPACE_DATA_MODE, commsTimeScale: env.COMMS_TIME_SCALE }));
   app.use('/v1', rateLimit({ windowMs: 60_000, max: 120 }));
   // guest sessions are the open door: keep it tight
+  app.use('/v1/auth', rateLimit({ windowMs: 15 * 60_000, max: env.NODE_ENV === 'test' ? 1000 : 30 }), authRouter(sessions, env.JWT_SECRET));
   app.use('/v1/sessions', rateLimit({ windowMs: 60 * 60_000, max: env.NODE_ENV === 'test' ? 1000 : 20 }), sessionsRouter(sessions));
   app.use('/v1/content', contentRouter());
   app.use('/v1/space', spaceDataRouter(space, env.SPACE_DATA_MODE));

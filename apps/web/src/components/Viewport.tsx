@@ -27,6 +27,8 @@ export function Viewport({
   look = DEFAULT_LOOK,
   frame = true,
   side = 'center',
+  eva = false,
+  shelter = false,
   className = '',
 }: {
   sim: SimState | null;
@@ -34,11 +36,13 @@ export function Viewport({
   frame?: boolean;
   /** Where the opening sits. The landing and select screens push it right to leave room for text. */
   side?: 'center' | 'right';
+  eva?: boolean;
+  shelter?: boolean;
   className?: string;
 }) {
   const atmo = useMemo(() => atmosphere(sim), [sim]);
-  const live = useRef<Live>({ atmo, panelDust: 0, greenhouse: 1, link: true });
-  live.current = { atmo, panelDust: sim?.power.panelDust ?? 0.04, greenhouse: sim?.power.powered.greenhouse ?? 1, link: sim?.comms.linkUp ?? true };
+  const live = useRef<Live>({ atmo, panelDust: 0, greenhouse: 1, link: true, eva: false, shelter: false });
+  live.current = { atmo, eva, shelter, panelDust: sim?.power.panelDust ?? 0.04, greenhouse: sim?.power.powered.greenhouse ?? 1, link: sim?.comms.linkUp ?? true };
 
   const [calm, setCalm] = useState(false);
   useEffect(() => {
