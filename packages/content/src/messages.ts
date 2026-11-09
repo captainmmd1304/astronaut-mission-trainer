@@ -21,6 +21,7 @@ export const scriptedMessages: ScriptedMessage[] = [
   { id: 'p-shelter', from: 'prithvi', trigger: 'shelter-power-lost', text: 'Shelter is unpowered. If a flare arrives now, the crew is unprotected.' },
   { id: 'p-delay', from: 'prithvi', trigger: 'flare-warning-delayed', text: "Earth's reply will take about {delayMin} minutes each way. Plan for what you can see now." },
   { id: 'p-eva', from: 'prithvi', trigger: 'eva-done', text: 'An EVA is a spacewalk. It can restore solar power but exposes the crew to risk.' },
+  { id: 'p-comms-power', from: 'prithvi', trigger: 'comms-down-power', text: 'Comms needs about half of its power to hold the link to Earth. Give it more and the link comes back.' },
   { id: 'p-eva-warning', from: 'prithvi', trigger: 'eva-in-warning', text: 'The crew was outside during a radiation warning. The shelter cannot protect people who are not in it.' },
 ];
 

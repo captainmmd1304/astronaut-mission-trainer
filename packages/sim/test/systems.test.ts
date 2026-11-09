@@ -125,6 +125,13 @@ describe('life support, food, comms, outcomes', () => {
     expect(all.some((e) => e.type === 'blackout-autonomy')).toBe(true);
   });
 
+  it('starving comms of power drops the link and says why', () => {
+    const r = play({ ...testRules, durationSols: 3 }, (s) => balanced(s, { power: { lifeSupport: 0.5, shielding: 0.2, greenhouse: 0.2, comms: 0, reserve: 0.1 } }));
+    const down = r.events.find((e) => e.type === 'comms-down');
+    expect(down?.explainKey).toBe('comms-down-power');
+    expect(r.state.comms.linkUp).toBe(false);
+  });
+
   it('a completed run reports completed and mission-complete', () => {
     const r = play({ ...testRules, durationSols: 4, balance: { ...testRules.balance, randomStormChancePerSol: 0 } }, (s) => balanced(s));
     expect(r.status).toBe('completed');

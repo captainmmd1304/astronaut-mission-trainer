@@ -1,5 +1,17 @@
-// PLACEHOLDER (no code yet)
-// 3D entry component (client-only, loaded with next/dynamic and ssr: false).
-// Contains: R3F Canvas (dpr capped at 1.5), limited-orbit isometric camera rig, one directional light + ambient,
-// sky (butterscotch day, blue sunset later), Suspense boundary, and these children: MarsTerrain, Habitat,
-// SolarFlare, DustStorm. Reads from game/store.ts. Budgets and rules: docs/3D_PIPELINE.md.
+'use client';
+import { Canvas } from '@react-three/fiber';
+import type { MutableRefObject } from 'react';
+import { Scene, type Live, type Look } from './Scene';
+
+export default function OutpostCanvas({ look, live, drift, shift }: { look: Look; live: MutableRefObject<Live>; drift: boolean; shift: number }) {
+  return (
+    <Canvas
+      dpr={[1, 1.5]}
+      camera={{ fov: 42, near: 0.5, far: 700, position: [0, 4, 18] }}
+      gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
+      style={{ position: 'absolute', inset: 0 }}
+    >
+      <Scene look={look} live={live} drift={drift} shift={shift} />
+    </Canvas>
+  );
+}

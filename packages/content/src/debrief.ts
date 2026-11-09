@@ -16,6 +16,8 @@ export const debriefTemplates: Record<string, string> = {
   'habitat-damage': 'Without a powered shelter, radiation damaged habitat systems on sol {sol}.',
   'equipment-fault': 'An equipment fault cut your power generation on sol {sol}.',
   'comms-blackout': 'Communications with Earth were lost on sol {sol}.',
+  'comms-down-power': 'The link to Earth dropped on sol {sol} because comms had too little power.',
+  'comms-down': 'The link to Earth dropped on sol {sol}. Nothing can be sent or received until it is back.',
   'blackout-autonomy': 'During the communications blackout you kept the outpost safe without guidance from Earth.',
   'food-shortage': 'Food stock ran short on sol {sol} because power went elsewhere.',
   'project-complete': 'The {project} project finished on sol {sol}.',
