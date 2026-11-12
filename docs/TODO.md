@@ -1,6 +1,27 @@
 # TODO
 
-Working list for things that are not code. Update it when something is done. Last updated 2026-11-03.
+Working list for things that are not code. Update it when something is done. Last updated 2026-11-12.
+
+## Product backlog: Malhar + Siya
+
+### Malhar
+
+- [ ] **Account identifier limits:** Decide whether account creation and sign-in should support email-style call signs. Align the client and API validation limits, show a useful validation message, and add tests for the minimum and maximum lengths.
+- [ ] **Black Box from the game portal:** Add a visible Black Box entry point to the game portal/navigation so players can open it without leaving the game flow. Preserve the existing protected answer/review behavior.
+- [ ] **Mission failure flow:** Define and implement what a crew sees when the mission fails: clear cause, crew status, score/debrief access, retry/re-fly path, and whether progress is retained.
+- [ ] **Project review revamp:** Rework the project-review layout and wording so it clearly explains the decision, result, trade-off, and next action.
+- [ ] **Project-review vocabulary:** Replace repeated sentences with varied, factually accurate templates for success, partial success, failure, and unavailable evidence. Keep the vocabulary appropriate for the youth audience.
+
+### Siya
+
+- [ ] **Chat box layout:** Adjust the chat box height, width, scrolling, and responsive behavior so messages remain readable during play without covering mission controls.
+- [ ] **Animation pass:** Improve the existing animation polish, prioritizing mission-critical feedback such as dust, damage, power changes, crew actions, and transitions. Keep the 3D performance rules in `docs/3D_PIPELINE.md`.
+- [ ] **Music and sound:** Add a lightweight music/ambient layer with mute and volume controls, plus a fallback when audio cannot load. Do not block gameplay on audio loading.
+- [ ] **Build-projects / sols-left bug:** Reproduce the issue where building projects interacts incorrectly with the “sols left” display, document the expected behavior, and add a regression test before fixing it.
+
+### Shared review
+
+- [ ] Review each completed item together in `SPACE_DATA_MODE=fixture`, then run `pnpm typecheck` and `pnpm test` before marking it done.
 
 ## Pinned (blocked, come back to it)
 
