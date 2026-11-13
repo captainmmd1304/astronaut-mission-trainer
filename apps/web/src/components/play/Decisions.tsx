@@ -10,6 +10,13 @@ const PROJECTS: { id: ProjectId; label: string; note: string; icon: string }[] =
   { id: 'battery-bank', label: 'Battery bank', note: 'Holds a quarter more', icon: 'battery' },
 ];
 
+const REVIEW: Record<ProjectId, { result: string; tradeoff: string; next: string }> = {
+  'shielding-upgrade': { result: 'Reduces future radiation dose.', tradeoff: 'Uses crew time and power while the build is active.', next: 'Keep shielding powered when a warning arrives.' },
+  'greenhouse-expansion': { result: 'Grows more food each sol.', tradeoff: 'Needs steady greenhouse power before it pays back.', next: 'Reserve power for life support first.' },
+  'panel-cleaning': { result: 'Clears most panel dust without an EVA.', tradeoff: 'Takes three sols of focused work.', next: 'Use it when dust is the main power risk.' },
+  'battery-bank': { result: 'Raises the energy reserve ceiling.', tradeoff: 'Takes the longest build time.', next: 'Charge it before the next storm.' },
+};
+
 function Order({ on, onClick, icon, title, sub, warn }: { on: boolean; onClick: () => void; icon: string; title: string; sub: string; warn?: string | null }) {
   return (
     <div>
@@ -61,8 +68,10 @@ export function BuildPicker() {
   const setProject = useGame((s) => s.setProject);
   if (!draft || !sim) return null;
   const running = new Map(sim.projects.map((p) => [p.id, p.solsRemaining]));
+  const selected = draft.project ? PROJECTS.find((p) => p.id === draft.project) : null;
   return (
-    <div role="radiogroup" aria-label="Project" className="grid grid-cols-2 gap-2.5">
+    <div>
+      <div role="radiogroup" aria-label="Project" className="grid grid-cols-2 gap-2.5">
       {PROJECTS.map((p) => {
         const on = draft.project === p.id;
         return (
@@ -73,6 +82,16 @@ export function BuildPicker() {
           </button>
         );
       })}
+      </div>
+      {selected && (
+        <div className="mt-3 rounded-xl border border-haze/40 bg-night/60 px-3 py-2.5 font-sans text-[13px] leading-snug text-bone/80">
+          <p className="font-bold text-haze">Project review · {selected.label}</p>
+          <p className="mt-1"><span className="text-bone">Decision:</span> build it over time.</p>
+          <p><span className="text-bone">Result:</span> {REVIEW[selected.id].result}</p>
+          <p><span className="text-bone">Trade-off:</span> {REVIEW[selected.id].tradeoff}</p>
+          <p><span className="text-bone">Next action:</span> {REVIEW[selected.id].next}</p>
+        </div>
+      )}
     </div>
   );
 }

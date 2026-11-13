@@ -59,6 +59,8 @@ function DebriefInner() {
 
   const failed = d.outcome === 'failed';
   const firstCauseSol = d.causeChain[0]?.sol;
+  const trigger = failed ? d.causeChain.at(-2) ?? d.causeChain.at(-1) : undefined;
+  const projectReviews = d.keyEvents.filter((e) => e.explainKey === 'project-complete');
   return (
     <main className="min-h-dvh px-5 py-10 md:px-[8vw] md:py-16">
       <div className="settle mx-auto max-w-[64rem]">
@@ -70,6 +72,12 @@ function DebriefInner() {
         <p className="instrument mt-3 text-[14px] text-bone/55">
           {d.generatedBy === 'llm' ? 'Rewritten by a free AI model from the facts below.' : 'Written from the mission log.'} Score {d.score ?? 0}.
         </p>
+
+        <section className="mt-8 grid gap-3 sm:grid-cols-3" aria-label="Mission result">
+          <div className="panel p-4"><p className="instrument text-[12px] uppercase tracking-wider text-haze">Crew status</p><p className="mt-1 text-[18px]">{failed ? 'Returned safely' : 'Mission crew active'}</p></div>
+          <div className="panel p-4"><p className="instrument text-[12px] uppercase tracking-wider text-haze">Score</p><p className="mt-1 text-[18px]">{d.score ?? 0} points</p></div>
+          <div className="panel p-4"><p className="instrument text-[12px] uppercase tracking-wider text-haze">{failed ? 'Primary trigger' : 'Result'}</p><p className="mt-1 text-[16px] leading-tight">{failed ? trigger?.text ?? 'The flight recorder has no single confirmed trigger.' : 'The outpost reached its target duration.'}</p></div>
+        </section>
 
         {d.causeChain.length > 0 && (
           <section className="mt-14">
@@ -86,6 +94,22 @@ function DebriefInner() {
                 </li>
               ))}
             </ol>
+          </section>
+        )}
+
+        {projectReviews.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-[28px] font-medium">Project review</h2>
+            <p className="mt-1 max-w-[58ch] text-[17px] text-bone/75">Each build changed what the crew could do next. The result includes its benefit and the trade-off that came with choosing it.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {projectReviews.map((p) => (
+                <article key={p.id} className="panel p-4">
+                  <p className="font-sans text-[13px] font-bold uppercase tracking-wider text-safe">Completed · sol {p.sol}</p>
+                  <p className="mt-1 text-[17px] leading-snug">{p.text}</p>
+                  <p className="mt-2 font-sans text-[13px] text-bone/60">Next action: keep checking power and choose the next build only when the crew has capacity.</p>
+                </article>
+              ))}
+            </div>
           </section>
         )}
 

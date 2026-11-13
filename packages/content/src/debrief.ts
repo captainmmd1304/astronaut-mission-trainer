@@ -20,7 +20,7 @@ export const debriefTemplates: Record<string, string> = {
   'comms-down': 'The link to Earth dropped on sol {sol}. Nothing can be sent or received until it is back.',
   'blackout-autonomy': 'During the communications blackout you kept the outpost safe without guidance from Earth.',
   'food-shortage': 'Food stock ran short on sol {sol} because power went elsewhere.',
-  'project-complete': 'The {project} project finished on sol {sol}.',
+  'project-complete': 'Success: {project} finished on sol {sol}; the upgrade is now helping the outpost.',
   evacuation: 'The crew left for the ascent vehicle on sol {sol}. The mission ended early, but everyone came home.',
   'mission-complete': 'You held Asteria for {sols} sols.',
 };
@@ -29,6 +29,16 @@ export const debriefClosingLine =
   'Asteria is not about finding the perfect decision. It is about keeping enough options alive to survive the next decision window.';
 
 export function renderDebriefLine(explainKey: string, vars: Record<string, string | number | boolean | undefined>): string {
-  const t = debriefTemplates[explainKey] ?? 'Something notable happened on sol {sol}.';
+  let t = debriefTemplates[explainKey] ?? 'Evidence is unavailable for one event on sol {sol}.';
+  if (explainKey === 'project-complete') {
+    const project = String(vars.project ?? 'The project');
+    const variants: Record<string, string> = {
+      'shielding-upgrade': 'Success: thicker shielding finished on sol {sol}; it lowers future radiation dose. The trade-off was time and power during construction.',
+      'greenhouse-expansion': 'Partial success: the greenhouse expansion finished on sol {sol}; it can grow more food, but only when it receives power.',
+      'panel-cleaning': 'Success: panel brushes finished on sol {sol}; they cleared dust without sending anyone outside.',
+      'battery-bank': 'Success: the battery bank finished on sol {sol}; it stores more energy for a later storm.',
+    };
+    t = variants[project] ?? 'Evidence is unavailable for the project finished on sol {sol}.';
+  }
   return t.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? '?'));
 }

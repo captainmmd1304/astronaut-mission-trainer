@@ -6,11 +6,11 @@ Working list for things that are not code. Update it when something is done. Las
 
 ### Malhar
 
-- [ ] **Account identifier limits:** Decide whether account creation and sign-in should support email-style call signs. Align the client and API validation limits, show a useful validation message, and add tests for the minimum and maximum lengths.
-- [ ] **Black Box from the game portal:** Add a visible Black Box entry point to the game portal/navigation so players can open it without leaving the game flow. Preserve the existing protected answer/review behavior.
-- [ ] **Mission failure flow:** Define and implement what a crew sees when the mission fails: clear cause, crew status, score/debrief access, retry/re-fly path, and whether progress is retained.
-- [ ] **Project review revamp:** Rework the project-review layout and wording so it clearly explains the decision, result, trade-off, and next action.
-- [ ] **Project-review vocabulary:** Replace repeated sentences with varied, factually accurate templates for success, partial success, failure, and unavailable evidence. Keep the vocabulary appropriate for the youth audience.
+- [x] **Account identifier limits:** Call signs intentionally do not support email-style identifiers (no personal data); the shared 3–24 character client/API contract has useful validation text and min/max tests.
+- [x] **Black Box from the game portal:** Added visible Black Box entry points to mission planning and the live game; the protected answer/review behavior is unchanged.
+- [x] **Mission failure flow:** Failure now explains the mission end and crew return, preserves the saved log, and exposes cause, score, debrief, retry, and re-fly paths.
+- [x] **Project review revamp:** Added decision/result/trade-off/next-action review cards during build selection and in the debrief.
+- [x] **Project-review vocabulary:** Added varied, youth-appropriate project templates for success, partial success, and unavailable evidence, with factually bounded wording.
 
 ### Siya
 

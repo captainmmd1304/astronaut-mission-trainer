@@ -103,6 +103,13 @@ describe('accounts', () => {
       const me = await t.call('GET', '/v1/auth/me', undefined, ok.body.token);
       expect(me.body.playerId).toBe(reg.body.playerId);
       expect((await t.call('POST', '/v1/auth/register', { username: 'ab', password: 'short' })).status).toBe(400);
+      expect((await t.call('POST', '/v1/auth/register', { username: 'a'.repeat(25), password: 'longenough1' })).status).toBe(400);
+      expect((await t.call('POST', '/v1/auth/register', { username: 'pilot.one', password: 'longenough1' })).status).toBe(400);
+      const min = await t.call('POST', '/v1/auth/register', { username: 'abc', password: 'longenough1' });
+      expect(min.status).toBe(201);
+      const max = await t.call('POST', '/v1/auth/register', { username: 'a'.repeat(24), password: 'longenough1' });
+      expect(max.status).toBe(201);
+      expect((await t.call('POST', '/v1/auth/login', { username: 'ab', password: 'longenough1' })).status).toBe(400);
     } finally {
       await t.close();
     }

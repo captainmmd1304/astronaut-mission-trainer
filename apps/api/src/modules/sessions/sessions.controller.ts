@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import { CreateSessionBody } from '@amt/shared';
+import { CreateSessionBody, UsernameSchema } from '@amt/shared';
 import { handler, parseBody } from '../../lib/http';
 import { z } from 'zod';
 import { requireAuth } from '../../lib/auth';
 import type { SessionsService } from './sessions.service';
 
-const Username = z.string().trim().min(3).max(24).regex(/^[a-zA-Z0-9_]+$/, 'letters, numbers and _ only');
 const Password = z.string().min(8).max(100);
-const RegisterBody = z.object({ username: Username, password: Password, displayName: z.string().trim().min(1).max(24).optional() });
-const LoginBody = z.object({ username: z.string().trim().min(1).max(24), password: z.string().min(1).max(100) });
+const RegisterBody = z.object({ username: UsernameSchema, password: Password, displayName: z.string().trim().min(1).max(24).optional() });
+const LoginBody = z.object({ username: UsernameSchema, password: z.string().min(1).max(100) });
 
 export function authRouter(service: SessionsService, secret: string) {
   const r = Router();

@@ -5,7 +5,7 @@ import { buildRules, objectivesMet, replay, CREW_SIZE } from '../game/rules';
 import { HttpError } from '../../lib/http';
 import type { RunRecord } from '../runs/runs.repository';
 
-const QUIET = new Set(['project-complete']);
+const QUIET = new Set<string>();
 
 /** Walk causedBy backwards from `event`, returning earliest-first. Handles shared causes once. */
 export function causeChain(events: SimEvent[], event: SimEvent): SimEvent[] {

@@ -47,8 +47,8 @@ export default function Login() {
             Asteria
           </Link>
           <h1 className="mt-2 text-[34px] font-medium leading-tight">{mode === 'in' ? 'Welcome back, commander' : 'Join the crew'}</h1>
-          <p className="mt-1 text-[16px] leading-snug text-bone/75">
-            {mode === 'in' ? 'Sign in to pick up your missions and debriefs.' : 'Make a call sign and password. No email and no real name needed.'}
+            <p className="mt-1 text-[16px] leading-snug text-bone/75">
+            {mode === 'in' ? 'Sign in to pick up your missions and debriefs.' : 'Make a 3–24 character call sign and password. No email or real name needed.'}
           </p>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
@@ -63,7 +63,7 @@ export default function Login() {
           <form onSubmit={submit} className="mt-5 space-y-4 font-sans">
             <label className="block">
               <span className="mb-1 block text-[14px] font-semibold text-bone/80">Call sign</span>
-              <input className="field" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" required minLength={mode === 'up' ? 3 : 1} maxLength={24} placeholder="e.g. red_dust_7" />
+              <input className="field" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" required minLength={3} maxLength={24} pattern="[A-Za-z0-9_]+" title="Use 3–24 letters, numbers, or underscores." placeholder="e.g. red_dust_7" />
             </label>
             {mode === 'up' && (
               <label className="block">

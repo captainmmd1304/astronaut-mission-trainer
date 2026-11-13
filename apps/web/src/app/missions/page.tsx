@@ -87,6 +87,7 @@ function MissionsInner() {
             Asteria
           </Link>
           <AccountChip />
+          <Link href="/blackbox" className="key key-quiet !px-3 !py-1.5 text-[13px]">Black Box</Link>
         </div>
         <h1 className="rise mt-6 text-[clamp(2.1rem,4.6vw,3.2rem)] font-medium leading-tight">Plan your mission</h1>
         <p className="rise mt-1 text-[17px] text-bone/75">Three choices, then you launch. The tour starts when you land.</p>

@@ -107,6 +107,9 @@ function PlayInner() {
               <Icon name="help" size={18} /> <span className="hidden sm:inline">How to play</span>
             </button>
             <AccountChip />
+            <Link href="/blackbox" className="key key-quiet">
+              <span className="hidden sm:inline">Black Box</span><span className="sm:hidden">Box</span>
+            </Link>
           </div>
         </header>
 
@@ -121,9 +124,9 @@ function PlayInner() {
             {over && (
               <div className="panel rise mx-auto max-w-md p-6 text-center">
                 <p className="font-sans text-[24px] font-extrabold leading-tight">
-                  {status === 'failed' ? `The habitat was lost on sol ${sim.sol}` : `You held the outpost for ${sim.sol} sols`}
+                  {status === 'failed' ? `Mission ended on sol ${sim.sol}` : `You held the outpost for ${sim.sol} sols`}
                 </p>
-                <p className="mt-1 text-[16px] text-bone/80">{status === 'failed' ? 'The debrief shows what led to it.' : 'Open the debrief to see how you did.'}</p>
+                <p className="mt-1 text-[16px] text-bone/80">{status === 'failed' ? 'The crew is safe in the ascent vehicle. Your mission log is saved so you can review the cause and try again.' : 'Your mission log is saved. Open the debrief to see how you did.'}</p>
                 {error && (
                   <p role="alert" className="mt-3 text-[15px] text-critical">
                     {error}
