@@ -14,10 +14,10 @@ Working list for things that are not code. Update it when something is done. Las
 
 ### Siya
 
-- [ ] **Chat box layout:** Adjust the chat box height, width, scrolling, and responsive behavior so messages remain readable during play without covering mission controls.
+- [x] **Chat box layout:** Adjusted log panel height to `clamp(9rem, 22vh, 14rem)` so it scales with the viewport without covering mission controls; added `overscroll-contain` and smart auto-scroll suppression when the user scrolls up.
 - [ ] **Animation pass:** Improve the existing animation polish, prioritizing mission-critical feedback such as dust, damage, power changes, crew actions, and transitions. Keep the 3D performance rules in `docs/3D_PIPELINE.md`.
 - [ ] **Music and sound:** Add a lightweight music/ambient layer with mute and volume controls, plus a fallback when audio cannot load. Do not block gameplay on audio loading.
-- [ ] **Build-projects / sols-left bug:** Reproduce the issue where building projects interacts incorrectly with the “sols left” display, document the expected behavior, and add a regression test before fixing it.
+- [x] **Build-projects / sols-left bug:** Reproduced — counter was blank on the first sol a project was selected (before commit). Fixed `BuildPicker` to show the full project duration from balance config when newly selected; two regression tests added in `systems.test.ts`. `pnpm typecheck` and `pnpm test` (35 tests) all pass.
 
 ### Shared review
 

@@ -65,23 +65,37 @@ export function CrewOrders() {
 export function BuildPicker() {
   const draft = useGame((s) => s.draft);
   const sim = useGame((s) => s.sim);
+  const run = useGame((s) => s.run);
   const setProject = useGame((s) => s.setProject);
-  if (!draft || !sim) return null;
-  const running = new Map(sim.projects.map((p) => [p.id, p.solsRemaining]));
+  if (!draft || !sim || !run) return null;
+  // sim.projects holds solsRemaining *after* the last committed sol.
+  // For a project the player has selected this sol but not yet committed,
+  // it won't be in sim.projects yet — show the full project length as the
+  // "starting" estimate so the counter reads "5 sols" → "4" → … → done.
+  const committed = new Map(sim.projects.map((p) => [p.id, p.solsRemaining]));
+  const projectSolsConfig = run.rules.balance.projectSols;
   const selected = draft.project ? PROJECTS.find((p) => p.id === draft.project) : null;
   return (
     <div>
       <div role="radiogroup" aria-label="Project" className="grid grid-cols-2 gap-2.5">
-      {PROJECTS.map((p) => {
-        const on = draft.project === p.id;
-        return (
-          <button key={p.id} type="button" role="radio" aria-checked={on} onClick={() => setProject(on ? null : p.id)} className={`key !flex-col !gap-1 !px-2 !py-2.5 !text-center ${on ? 'key-on' : ''}`}>
-            <Icon name={p.icon} size={22} className={on ? 'text-haze' : 'text-bone/70'} />
-            <span className="text-[13.5px] leading-tight">{p.label}</span>
-            <span className="text-[11.5px] font-medium leading-tight text-bone/60">{running.has(p.id) ? `${running.get(p.id)} sols left` : p.note}</span>
-          </button>
-        );
-      })}
+        {PROJECTS.map((p) => {
+          const on = draft.project === p.id;
+          // If the project is in-flight (committed at least once), show remaining.
+          // If it is selected this sol for the first time, show the full duration
+          // so the player sees how long it will take before they commit.
+          const solsLeft = committed.has(p.id)
+            ? committed.get(p.id)
+            : on
+              ? projectSolsConfig[p.id] ?? null
+              : null;
+          return (
+            <button key={p.id} type="button" role="radio" aria-checked={on} onClick={() => setProject(on ? null : p.id)} className={`key !flex-col !gap-1 !px-2 !py-2.5 !text-center ${on ? 'key-on' : ''}`}>
+              <Icon name={p.icon} size={22} className={on ? 'text-haze' : 'text-bone/70'} />
+              <span className="text-[13.5px] leading-tight">{p.label}</span>
+              <span className="text-[11.5px] font-medium leading-tight text-bone/60">{solsLeft != null ? `${solsLeft} sols left` : p.note}</span>
+            </button>
+          );
+        })}
       </div>
       {selected && (
         <div className="mt-3 rounded-xl border border-haze/40 bg-night/60 px-3 py-2.5 font-sans text-[13px] leading-snug text-bone/80">

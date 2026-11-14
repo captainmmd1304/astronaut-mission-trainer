@@ -145,9 +145,11 @@ function PlayInner() {
                 </div>
               </div>
             )}
-            <div data-tour="log" className="panel h-44 shrink-0 px-4 py-2 md:h-48">
-              <LogPanel />
-            </div>
+              {/* Log panel: fixed height on mobile so it never covers the action buttons;
+                on md+ it flexes to fill whatever space remains in the centre column. */}
+              <div data-tour="log" className="panel flex min-h-0 flex-col px-4 py-2" style={{ height: 'clamp(9rem, 22vh, 14rem)' }}>
+                <LogPanel />
+              </div>
           </section>
 
           <aside className="panel rise flex min-h-0 flex-col p-3" style={{ animationDelay: '0.1s' }}>

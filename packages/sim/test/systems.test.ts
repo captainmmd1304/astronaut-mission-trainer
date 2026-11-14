@@ -158,4 +158,45 @@ describe('life support, food, comms, outcomes', () => {
     expect(r.state.radiation.shieldingLevel).toBeGreaterThan(0);
     expect(r.events.some((e) => e.type === 'project-complete')).toBe(true);
   });
+
+  it('sols-left display: first sol of a project shows projectSols-1 remaining (regression)', () => {
+    // Regression for: "build-projects / sols-left bug" (TODO.md, Siya).
+    // Expected: after the player commits sol 1 with a project selected, solsRemaining
+    // should equal projectSols[id] - 1. Before the fix it showed projectSols[id] - 1
+    // already on the FIRST display (init + decrement happened in the same step),
+    // making the counter appear to skip a sol.
+    const noStorm = { ...testRules, balance: { ...testRules.balance, randomStormChancePerSol: 0 } };
+    const projectSols = noStorm.balance.projectSols['panel-cleaning']!; // 3
+    let state = createInitialState(testConfig, noStorm);
+
+    // Sol 1: player picks the project for the first time.
+    const r1 = step(state, balanced(1, { project: 'panel-cleaning' }), calmWorld, noStorm);
+    const entry = r1.state.projects.find((p) => p.id === 'panel-cleaning');
+    // After committing sol 1, the counter must be projectSols - 1 (2 more sols of work left).
+    expect(entry).toBeDefined();
+    expect(entry!.solsRemaining).toBe(projectSols - 1);
+
+    // Sol 2: second sol of work → 1 sol left.
+    const r2 = step(r1.state, balanced(2, { project: 'panel-cleaning' }), calmWorld, noStorm);
+    expect(r2.state.projects.find((p) => p.id === 'panel-cleaning')!.solsRemaining).toBe(projectSols - 2);
+
+    // Sol 3: project completes → removed from the list, event emitted.
+    const r3 = step(r2.state, balanced(3, { project: 'panel-cleaning' }), calmWorld, noStorm);
+    expect(r3.state.projects.find((p) => p.id === 'panel-cleaning')).toBeUndefined();
+    expect(r3.events.some((e) => e.type === 'project-complete')).toBe(true);
+  });
+
+  it('sols-left display: switching projects mid-build does not carry over progress (regression)', () => {
+    // If the player works on project A for 2 sols then switches to B, project A
+    // should still have its remaining sols frozen until the player returns.
+    const noStorm = { ...testRules, balance: { ...testRules.balance, randomStormChancePerSol: 0 } };
+    let state = createInitialState(testConfig, noStorm);
+    state = step(state, balanced(1, { project: 'shielding-upgrade' }), calmWorld, noStorm).state;
+    state = step(state, balanced(2, { project: 'shielding-upgrade' }), calmWorld, noStorm).state;
+    // Switch to battery-bank for one sol — shielding-upgrade should not progress.
+    const before = state.projects.find((p) => p.id === 'shielding-upgrade')!.solsRemaining;
+    state = step(state, balanced(3, { project: 'battery-bank' }), calmWorld, noStorm).state;
+    const after = state.projects.find((p) => p.id === 'shielding-upgrade')?.solsRemaining;
+    expect(after).toBe(before); // frozen, not decremented
+  });
 });
